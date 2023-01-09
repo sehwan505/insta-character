@@ -1,14 +1,9 @@
-# defaul main.py in fastapi
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 
+from utils.util import get_query_token
+from apps import insta
+
+# app = FastAPI(dependencies=[Depends(get_query_token)]) # token 유무 확인하는 dependencies
 app = FastAPI()
 
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
+app.include_router(insta.router)
