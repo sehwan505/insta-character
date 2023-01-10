@@ -14,12 +14,19 @@ router = APIRouter(
 fake_items_db = {"abc":{"count": 0, "name": "newjeans"}}
 
 access_token = ""
-post_url = f"https://graph.instagram.com/v13.0/515981870361983?fields=username&access_token={access_token}"
+instagram_account_id = "6279811568718004"
 
+# facebook for developer 에서 tester 계정으로 테스트 해봐야 함
 @router.get("/{insta_id}")
 def get_insta_data(insta_id):
-    r = requests.get(post_url)
-    ret = r.json()
+    try:
+        post_url = f"https://graph.instagram.com/v13.0/{instagram_account_id}?fields=id&access_token={access_token}"
+        print(post_url)
+        r = requests.get(post_url)
+        ret = r.json()
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="server error")
     fake_items_db[insta_id]["count"] += 1
     return {"id": insta_id, "count": fake_items_db[insta_id]["count"], "ret": ret}
 
