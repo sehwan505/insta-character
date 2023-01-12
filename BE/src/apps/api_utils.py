@@ -1,7 +1,15 @@
 
 import requests
-client_id = '6292734064078258'
-client_secret = 'd22412ef3e3f0b013f42b7eef3ffcddf'
+from pathlib import Path
+import os
+import json
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+with open(os.path.join(BASE_DIR, "config.json"), "r") as f:
+    config = json.load(f)
+
+client_id = config["app_client_id"]
+client_secret = config["app_client_secret"]
 redirect_url = 'https://k-army-project-irpqk.run.goorm.io/'
 access_url = 'https://www.facebook.com/v13.0/dialog/oauth?response_type=token&display=popup&client_id=your_client_id&redirect_uri=your_redirect_uri&auth_type=rerequest&scope=user_location%2Cuser_photos%2Cuser_friends%2Cuser_gender%2Cpages_show_list%2Cinstagram_basic%2Cinstagram_manage_comments%2Cinstagram_manage_insights%2Cpages_read_engagement%2Cpublic_profile'
 graph_url = 'https://graph.facebook.com/v15.0/'
