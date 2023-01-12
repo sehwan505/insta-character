@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from utils.util import get_token_header
+from .api_utils import func_get_long_lived_access_token, func_get_page_id, func_get_instagram_business_account
 import requests
 import json
 
@@ -11,28 +12,47 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-fake_items_db = {"abc":{"count": 0, "name": "newjeans"}}
-
 access_token = ""
-instagram_account_id = "6279811568718004"
+instagram_account_id = "3312068002378609"
 
-# facebook for developer 에서 tester 계정으로 테스트 해봐야 함
-@router.get("/{insta_id}")
-def get_insta_data(insta_id):
+@router.get("/generate_token/{token}")
+def generate_longlive_token(token):   
     try:
-        post_url = f"https://graph.instagram.com/v13.0/{instagram_account_id}?fields=id&access_token={access_token}"
-        print(post_url)
-        r = requests.get(post_url)
-        ret = r.json()
+        global access_token
+        access_token = func_get_long_lived_access_token(access_token=token)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
-    fake_items_db[insta_id]["count"] += 1
-    return {"id": insta_id, "count": fake_items_db[insta_id]["count"], "ret": ret}
+    return {"access_token": access_token}
 
-@router.get("/count/{insta_id}")
+@router.get("/get_instagram_id")
+def get_instagram_id():   
+    try:
+        global instagram_account_id
+        page_id = func_get_page_id(access_token)
+        instagram_account_id = func_get_instagram_business_account(page_id, access_token)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="server error")
+    return {"instagram_account_id": instagram_account_id}
+
+
+@router.get("/{insta_id}")
 def get_insta_data(insta_id):
-    if insta_id not in fake_items_db:
-        raise HTTPException(status_code=404, detail="insta_id not in fake_items_db")
-    return {"count": fake_items_db[insta_id]["count"]}
+    try:
+        ret = func_get_business_account_deatils(insta_id, instagram_account_id, access_token)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="server error")
+    return {"id": insta_id, "ret": ret}
 
+graph_url = 'https://graph.facebook.com/v15.0/'
+def func_get_business_account_deatils(search_id='',instagram_account_id='',access_token=''):
+    url = graph_url + instagram_account_id 
+    param = dict()
+    param['fields'] = 'business_discovery.username('+search_id + \
+        '){followers_count,follows_count,name,biography,username,profile_picture_url,id, media_count,media{comments_count,like_count,media_url,permalink,user_name,caption,timestamp,media_type,media_product_type}}'
+    param['access_token'] = access_token
+    response = requests.get(url,params=param)
+    response =response.json()
+    return response
