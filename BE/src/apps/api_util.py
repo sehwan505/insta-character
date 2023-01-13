@@ -22,9 +22,7 @@ def func_get_long_lived_access_token(access_token = ''):
     param['client_secret'] = client_secret
     param['fb_exchange_token'] = access_token
     response = requests.get(url = url,params=param)
-    print("\n response",response)
     response =response.json()
-    print("\n response",response)
     long_lived_access_tokken = response['access_token']
     return long_lived_access_tokken
   
@@ -33,9 +31,7 @@ def func_get_page_id(access_token = ''):
     param = dict()
     param['access_token'] = access_token
     response = requests.get(url = url,params=param)
-    print("\n response", response)
     response = response.json()
-    print("\n response", response)
     page_id = response['data'][0]['id']
     print("\n page_id",page_id)
     return page_id
@@ -46,7 +42,6 @@ def func_get_instagram_business_account(page_id = '',access_token = ''):
     param['fields'] = 'instagram_business_account'
     param['access_token'] = access_token
     response = requests.get(url = url,params=param)
-    print("\n response",response)
     response = response.json()
     print("\n response", response)
     try:

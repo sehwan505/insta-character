@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from utils.util import get_token_header
-from .api_utils import func_get_long_lived_access_token, func_get_page_id, func_get_instagram_business_account
+from .api_util import func_get_long_lived_access_token, func_get_page_id, func_get_instagram_business_account
 import requests
 import json
 
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 access_token = ""
-instagram_account_id = "3312068002378609"
+instagram_account_id = ""
 
 @router.get("/generate_token/{token}")
 def generate_longlive_token(token):   
