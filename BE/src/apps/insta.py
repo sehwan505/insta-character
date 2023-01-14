@@ -3,7 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from utils.util import get_token_header
 from .api_util import func_get_long_lived_access_token, func_get_page_id, func_get_instagram_business_account
 import requests
+from pathlib import Path
+import os
 import json
+from .login import save_user, UserData
 
 router = APIRouter(
     prefix="/insta",
@@ -12,8 +15,12 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-access_token = ""
-instagram_account_id = ""
+BASE_DIR = Path(__file__).resolve().parent.parent
+with open(os.path.join(BASE_DIR, "config.json"), "r") as f:
+    config = json.load(f)
+
+access_token = config["long_lived_token"]
+instagram_account_id = config["account_id"]
 
 @router.get("/generate_token/{token}")
 def generate_longlive_token(token):   
@@ -41,10 +48,12 @@ def get_instagram_id():
 def get_insta_data(insta_id):
     try:
         ret = func_get_business_account_deatils(insta_id, instagram_account_id, access_token)
+        print(ret)
+        save_user(UserData(insta_id=insta_id, is_admin=False, name=ret["business_discovery"]['name']))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
-    return {"id": insta_id, "ret": ret}
+    return {"ret": ret}
 
 graph_url = 'https://graph.facebook.com/v15.0/'
 def func_get_business_account_deatils(search_id='',instagram_account_id='',access_token=''):

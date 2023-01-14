@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 with open(os.path.join(BASE_DIR, "config.json"), "r") as f:
     config = json.load(f)
 
-DB_URL = 'mysql+pymysql://root:root@localhost:3306/insta_character?charset=utf8mb4'
+DB_URL = 'mysql+pymysql://root:root@localhost:3306/insta_character'
 
 class engineconn:
     def __init__(self):
