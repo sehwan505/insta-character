@@ -1,12 +1,6 @@
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
-from pathlib import Path
-import os
-import json
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-with open(os.path.join(BASE_DIR, "config.json"), "r") as f:
-    config = json.load(f)
+from utils.util import config
 
 DB_URL = 'mysql+pymysql://root:root@localhost:3306/insta_character'
 
@@ -22,3 +16,6 @@ class engineconn:
     def connection(self):
         conn = self.engine.connect()
         return conn
+
+engine = engineconn()
+session = engine.sessionmaker()

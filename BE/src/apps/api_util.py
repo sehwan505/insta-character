@@ -1,12 +1,6 @@
 
 import requests
-from pathlib import Path
-import os
-import json
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-with open(os.path.join(BASE_DIR, "config.json"), "r") as f:
-    config = json.load(f)
+from utils.util import config
 
 client_id = config["app_client_id"]
 client_secret = config["app_client_secret"]

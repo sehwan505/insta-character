@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
-
 from utils.util import get_token_header
 from .api_util import func_get_long_lived_access_token, func_get_page_id, func_get_instagram_business_account
 import requests
-from pathlib import Path
-import os
-import json
-from .login import save_user, UserData
+from .user import save_user, UserData
+from sqlalchemy.orm import Session
+from utils.deps import get_db
+from utils.util import config
+from db.model import User
+from datetime import datetime
 
 router = APIRouter(
     prefix="/insta",
@@ -14,10 +15,6 @@ router = APIRouter(
     # dependencies=[Depends(get_token_header)], #  token header 유무 확인하는 dependencies
     responses={404: {"description": "Not found"}},
 )
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-with open(os.path.join(BASE_DIR, "config.json"), "r") as f:
-    config = json.load(f)
 
 access_token = config["long_lived_token"]
 instagram_account_id = config["account_id"]
@@ -45,18 +42,21 @@ def get_instagram_id():
 
 
 @router.get("/{insta_id}")
-def get_insta_data(insta_id):
+def get_insta_data(insta_id: str, session: Session = Depends(get_db)):
     try:
-        ret = func_get_business_account_deatils(insta_id, instagram_account_id, access_token)
-        print(ret)
-        save_user(UserData(insta_id=insta_id, is_admin=False, name=ret["business_discovery"]['name']))
+        if (existing_user := _get_existing_user(insta_id, session)) is None:
+            response = _func_get_business_account_details(insta_id, instagram_account_id, access_token)
+            save_user(UserData(insta_id=insta_id, is_admin=False, name=response["business_discovery"]['name']), session)
+        else:
+            print("already exist")
+            return existing_user
     except Exception as e:
-        print(e)
+        print(e, "error")
         raise HTTPException(status_code=500, detail="server error")
-    return {"ret": ret}
+    return {"response": response}
 
 graph_url = 'https://graph.facebook.com/v15.0/'
-def func_get_business_account_deatils(search_id='',instagram_account_id='',access_token=''):
+def _func_get_business_account_details(search_id='',instagram_account_id='',access_token=''):
     url = graph_url + instagram_account_id 
     param = dict()
     param['fields'] = 'business_discovery.username('+search_id + \
@@ -65,3 +65,7 @@ def func_get_business_account_deatils(search_id='',instagram_account_id='',acces
     response = requests.get(url,params=param)
     response =response.json()
     return response
+
+def _get_existing_user(insta_id: str, session: Session):
+    user = session.query(User).filter_by(insta_id=insta_id).first()
+    return user
