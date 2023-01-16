@@ -2,7 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
 from utils.util import config
 
-DB_URL = 'mysql+pymysql://root:root@localhost:3306/insta_character'
+DB_URL = f'mysql+pymysql://{config["mysql_id"]}:{config["mysql_password"]}@{config["mysql_host"]}:3306/insta_character'
 
 class engineconn:
     def __init__(self):
