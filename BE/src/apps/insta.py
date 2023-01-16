@@ -40,11 +40,10 @@ def get_instagram_id():
         raise HTTPException(status_code=500, detail="server error")
     return {"instagram_account_id": instagram_account_id}
 
-
 @router.get("/{insta_id}")
 def get_insta_data(insta_id: str, session: Session = Depends(get_db)):
     try:
-        if (existing_user := _get_existing_user(insta_id, session)) is None:
+        if (existing_user := _get_existing_user(insta_id, session)) is None or (datetime.now() - existing_user.updated_at).total_seconds() > 3600:
             response = _func_get_business_account_details(insta_id, instagram_account_id, access_token)
             save_user(UserData(insta_id=insta_id, is_admin=False, name=response["business_discovery"]['name']), session)
         else:
@@ -67,5 +66,9 @@ def _func_get_business_account_details(search_id='',instagram_account_id='',acce
     return response
 
 def _get_existing_user(insta_id: str, session: Session):
-    user = session.query(User).filter_by(insta_id=insta_id).first()
+    user = session.query(User).filter_by(insta_id=insta_id).order_by(User.id.desc()).first()
     return user
+
+
+
+#make function to compare update_at with current time
