@@ -13,22 +13,23 @@ router = APIRouter(
 
 class UserData(BaseModel):
     insta_id: str
-    is_admin: bool
     name: str
+    followers_count : int
+    follows_count : int
+    biography : str = ""
 
 class UserList(BaseModel):
     __root__: List[UserData]
 
-@router.get("/get_all_user",  response_model=UserData)
+@router.get("/get_all_user")
 def get_all_user(session: Session = Depends(get_db)):
     users = session.query(User).all()
-    print(users)
-    return {"users": UserList(users)}
+    return {"users": users}
     
 @router.post("/save_user_direct")
 def save_user_direct(user_data: UserData, session: Session = Depends(get_db)):
     try:
-        new_user = User(insta_id=user_data.insta_id, is_admin=user_data.is_admin, name=user_data.name)
+        new_user = User(insta_id=user_data.insta_id, name=user_data.name, followers_count=user_data.followers_count, follows_count=user_data.follows_count, biography=user_data.biography)
         session.add(new_user)
         response = session.commit()
     except Exception as e:
@@ -38,7 +39,7 @@ def save_user_direct(user_data: UserData, session: Session = Depends(get_db)):
 
 def save_user(user_data: UserData, session: Session):
     try:
-        new_user = User(insta_id=user_data.insta_id, is_admin=user_data.is_admin, name=user_data.name)
+        new_user = User(insta_id=user_data.insta_id, name=user_data.name, followers_count=user_data.followers_count, follows_count=user_data.follows_count, biography=user_data.biography)
         session.add(new_user)
         response = session.commit()
     except Exception as e:

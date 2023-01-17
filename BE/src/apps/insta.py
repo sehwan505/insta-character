@@ -45,7 +45,7 @@ def get_insta_data(insta_id: str, session: Session = Depends(get_db)):
     try:
         if (existing_user := _get_existing_user(insta_id, session)) is None or (datetime.now() - existing_user.updated_at).total_seconds() > 3600:
             response = _func_get_business_account_details(insta_id, instagram_account_id, access_token)
-            save_user(UserData(insta_id=insta_id, is_admin=False, name=response["business_discovery"]['name']), session)
+            save_user(UserData(insta_id=insta_id, name=response["business_discovery"]['name'], followers_count=response["business_discovery"]['followers_count'], follows_count=response["business_discovery"]['follows_count'], biography=response["business_discovery"]['biography']), session)
         else:
             print("already exist")
             return existing_user
@@ -62,7 +62,7 @@ def _func_get_business_account_details(search_id='',instagram_account_id='',acce
         '){followers_count,follows_count,name,biography,username,profile_picture_url,id, media_count,media{comments_count,like_count,media_url,permalink,user_name,caption,timestamp,media_type,media_product_type}}'
     param['access_token'] = access_token
     response = requests.get(url,params=param)
-    response =response.json()
+    response = response.json()
     return response
 
 def _get_existing_user(insta_id: str, session: Session):
