@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from utils.util import get_token_header
 from .api_util import func_get_long_lived_access_token, func_get_page_id, func_get_instagram_business_account
 import requests
-from .user import save_user, UserData
+from .user import save_user, UserData, update_user
 from sqlalchemy.orm import Session
 from utils.deps import get_db
 from utils.util import config
@@ -43,9 +43,14 @@ def get_instagram_id():
 @router.get("/{insta_id}")
 def get_insta_data(insta_id: str, session: Session = Depends(get_db)):
     try:
-        if (existing_user := _get_existing_user(insta_id, session)) is None or (datetime.now() - existing_user.updated_at).total_seconds() > 3600:
+        if (existing_user := _get_existing_user(insta_id, session)) is None:
             response = _func_get_business_account_details(insta_id, instagram_account_id, access_token)
             save_user(UserData(insta_id=insta_id, name=response["business_discovery"]['name'], followers_count=response["business_discovery"]['followers_count'], follows_count=response["business_discovery"]['follows_count'], biography=response["business_discovery"]['biography']), session)
+            # save_media(response["business_discovery"]['media']['data'], insta_id, session)
+        elif (datetime.now() - existing_user.updated_at).total_seconds() > 3600:
+            response = _func_get_business_account_details(insta_id, instagram_account_id, access_token)
+            update_user(UserData(insta_id=insta_id, name=response["business_discovery"]['name'], followers_count=response["business_discovery"]['followers_count'], follows_count=response["business_discovery"]['follows_count'], biography=response["business_discovery"]['biography']), session)
+            # save_media(response["business_discovery"]['media']['data'], insta_id, session)
         else:
             print("already exist")
             return existing_user

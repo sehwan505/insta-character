@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from db.model import User
+from db.model import User, InstaMedia
 from pydantic import BaseModel
 from typing import List
 from sqlalchemy.orm import Session
 from utils.deps import get_db
+from db.session import engine
 
 router = APIRouter(
     prefix="/user",
@@ -46,3 +47,22 @@ def save_user(user_data: UserData, session: Session):
         print(e)
         raise HTTPException(status_code=500, detail="server error")
     return {"response": response}
+
+
+def update_user(user_data: UserData, session: Session):
+    try:
+        new_inform = User(insta_id=user_data.insta_id, name=user_data.name, followers_count=user_data.followers_count, follows_count=user_data.follows_count, biography=user_data.biography)
+        session.query(User).filter_by(insta_id=user_data.insta_id).update(new_inform)
+        response = session.commit()
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="server error")
+    return {"response": response}
+
+
+# @router.get("/make_table")
+# def make_table():
+#     User.__table__.create(bind=engine.engine, checkfirst=True)
+#     InstaMedia.__table__.create(bind=engine.engine, checkfirst=True)
+
+#     return 
