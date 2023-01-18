@@ -19,6 +19,18 @@ class UserData(BaseModel):
     follows_count : int
     biography : str = ""
 
+class MediaData(BaseModel):
+    insta_id: str
+    comments_count: int
+    like_count: int
+    # media_url : str
+    caption : str
+    media_type : str
+    media_product_type : str
+
+class MediaList(BaseModel):
+    __root__: List[MediaData]
+
 class UserList(BaseModel):
     __root__: List[UserData]
 
@@ -53,6 +65,16 @@ def update_user(user_data: UserData, session: Session):
     try:
         new_inform = User(insta_id=user_data.insta_id, name=user_data.name, followers_count=user_data.followers_count, follows_count=user_data.follows_count, biography=user_data.biography)
         session.query(User).filter_by(insta_id=user_data.insta_id).update(new_inform)
+        response = session.commit()
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="server error")
+    return {"response": response}
+
+def save_media(media_list: MediaList, insta_id: str, session: Session):
+    try:
+        new_media = InstaMedia(insta_id=user_data.insta_id, name=user_data.name, followers_count=user_data.followers_count, follows_count=user_data.follows_count, biography=user_data.biography)
+        session.bulk_save_objects(new_media)
         response = session.commit()
     except Exception as e:
         print(e)
