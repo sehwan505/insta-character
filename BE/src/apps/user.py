@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from db.model import User, InstaMedia
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 from typing import List
 from sqlalchemy.orm import Session
 from utils.deps import get_db
@@ -20,7 +20,6 @@ class UserData(BaseModel):
     biography : str = ""
 
 class MediaData(BaseModel):
-    insta_id: str
     comments_count: int
     like_count: int
     # media_url : str
@@ -28,8 +27,8 @@ class MediaData(BaseModel):
     media_type : str
     media_product_type : str
 
-class MediaList(BaseModel):
-    __root__: List[MediaData]
+    class Config:
+        extra = Extra.allow
 
 class UserList(BaseModel):
     __root__: List[UserData]
@@ -63,18 +62,22 @@ def save_user(user_data: UserData, session: Session):
 
 def update_user(user_data: UserData, session: Session):
     try:
-        new_inform = User(insta_id=user_data.insta_id, name=user_data.name, followers_count=user_data.followers_count, follows_count=user_data.follows_count, biography=user_data.biography)
-        session.query(User).filter_by(insta_id=user_data.insta_id).update(new_inform)
+        session.query(User).filter(User.insta_id == user_data.insta_id).update(user_data.dict())
         response = session.commit()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
     return {"response": response}
 
-def save_media(media_list: MediaList, insta_id: str, session: Session):
+def save_media(media_list: List[dict], insta_id: str, session: Session):
     try:
-        new_media = InstaMedia(insta_id=user_data.insta_id, name=user_data.name, followers_count=user_data.followers_count, follows_count=user_data.follows_count, biography=user_data.biography)
-        session.bulk_save_objects(new_media)
+        print(media_list)
+
+        for media in media_list:
+            media["insta_id"] = insta_id
+            del media["id"]
+
+        session.bulk_insert_mappings(InstaMedia, media_list)
         response = session.commit()
     except Exception as e:
         print(e)
