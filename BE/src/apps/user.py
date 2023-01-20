@@ -5,6 +5,8 @@ from typing import List
 from sqlalchemy.orm import Session
 from utils.deps import get_db
 from db.session import engine
+from datetime import datetime
+
 
 router = APIRouter(
     prefix="/user",
@@ -69,14 +71,22 @@ def update_user(user_data: UserData, session: Session):
         raise HTTPException(status_code=500, detail="server error")
     return {"response": response}
 
-def save_media(media_list: List[dict], insta_id: str, session: Session):
+def save_media(media_list: List[dict], insta_id: str, session: Session, updated_at: datetime = None):
     try:
-        print(media_list)
-
-        for media in media_list:
-            media["insta_id"] = insta_id
-            del media["id"]
-
+        if updated_at is not None:
+            temp_list = []
+            for media in media_list:
+                media["insta_id"] = insta_id
+                del media["id"]
+                if (timestamp := datetime.strptime(media["timestamp"], '%Y-%m-%dT%H:%M:%S+0000')) > updated_at:
+                    media["timestamp"] = timestamp
+                    temp_list.append(media)
+            media_list = temp_list
+        else:
+            for media in media_list:
+                media["insta_id"] = insta_id
+                del media["id"]
+            
         session.bulk_insert_mappings(InstaMedia, media_list)
         response = session.commit()
     except Exception as e:

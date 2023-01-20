@@ -32,6 +32,8 @@ class InstaMedia(Base):
     caption = Column(TEXT, nullable=True)
     media_type = Column(TEXT, nullable=True)
     media_product_type = Column(TEXT, nullable=True)
+    timestamp = Column(DateTime, nullable=True)
+
     user = relationship("User", back_populates="media")
 
 
