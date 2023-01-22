@@ -57,7 +57,7 @@ def get_insta_data(insta_id: str, session: Session = Depends(get_db)):
             return existing_user
     except Exception as e:
         print(e, "error")
-        raise HTTPException(status_code=500, detail="server error")
+        raise HTTPException(status_code=500, detail=f"server error\n{e}")
     return {"response": response}
 
 graph_url = 'https://graph.facebook.com/v15.0/'
