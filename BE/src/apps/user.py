@@ -39,7 +39,12 @@ class UserList(BaseModel):
 def get_all_user(session: Session = Depends(get_db)):
     users = session.query(User).all()
     return {"users": users}
-    
+
+@router.get("/get_media_by_user/{insta_id}")
+def get_media_by_user(insta_id: str, session: Session = Depends(get_db)):
+    media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).all()
+    return {"media": media}
+
 @router.post("/save_user_direct")
 def save_user_direct(user_data: UserData, session: Session = Depends(get_db)):
     try:
