@@ -10,3 +10,15 @@ INFO:     Application startup complete.
 ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
+INFO:     Started server process [25350]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     172.17.0.1:54518 - "GET /docs HTTP/1.1" 200 OK
+INFO:     172.17.0.1:54518 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.17.0.1:56778 - "GET / HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:56778 - "GET / HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [25350]

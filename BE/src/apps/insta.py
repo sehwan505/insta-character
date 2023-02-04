@@ -45,19 +45,20 @@ def get_insta_data(insta_id: str, session: Session = Depends(get_db)):
     try:
         if (existing_user := _get_existing_user(insta_id, session)) is None:
             response = _func_get_business_account_details(insta_id, instagram_account_id, access_token)
-            save_user(UserData(insta_id=insta_id, name=response["business_discovery"]['name'], followers_count=response["business_discovery"]['followers_count'], follows_count=response["business_discovery"]['follows_count'], biography=response["business_discovery"]['biography']), session)
-            save_media(response["business_discovery"]['media']['data'], insta_id, session)
+            save_user(UserData(insta_id=insta_id, name=response["business_discovery"]['name'], followers_count=response["business_discovery"]['followers_count'], follows_count=response["business_discovery"]['follows_count'], biography=response["business_discovery"].get('biography', "")), session)
+            if response["business_discovery"]['media']:
+                save_media(response["business_discovery"]['media']['data'], insta_id, session)
         elif (datetime.now() - existing_user.updated_at).total_seconds() > 3600:
             prev_update_at = existing_user.updated_at
             response = _func_get_business_account_details(insta_id, instagram_account_id, access_token)
-            update_user(UserData(insta_id=insta_id, name=response["business_discovery"]['name'], followers_count=response["business_discovery"]['followers_count'], follows_count=response["business_discovery"]['follows_count'], biography=response["business_discovery"]['biography']), session)
-            save_media(response["business_discovery"]['media']['data'], insta_id, session, prev_update_at)
+            update_user(UserData(insta_id=insta_id, name=response["business_discovery"]['name'], followers_count=response["business_discovery"]['followers_count'], follows_count=response["business_discovery"]['follows_count'], biography=response["business_discovery"].get("biography", "")), session)
+            if response["business_discovery"]['media']:  
+                save_media(response["business_discovery"]['media']['data'], insta_id, session, prev_update_at)
         else:
             print("already exist")
             return existing_user
     except Exception as e:
-        print(e, "error")
-        raise HTTPException(status_code=500, detail=f"server error\n{e}")
+        raise e
     return {"response": response}
 
 graph_url = 'https://graph.facebook.com/v15.0/'
@@ -68,6 +69,9 @@ def _func_get_business_account_details(search_id='',instagram_account_id='', acc
         '){followers_count,follows_count,name,biography,username,profile_picture_url,id, media_count,media{comments_count,like_count,media_url,permalink,user_name,caption,timestamp,media_type,media_product_type}}'
     param['access_token'] = access_token
     response = requests.get(url,params=param)
+    print(response.status_code, type(response.status_code))
+    if response.status_code != 200:
+        raise HTTPException(status_code=403, detail="api raise error\n you should check this account is not bussiness account or doesn't")
     response = response.json()
     return response
 
