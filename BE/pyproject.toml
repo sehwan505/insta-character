@@ -16,6 +16,7 @@ pydantic = "^1.10.4"
 sqlalchemy = "^1.4.46"
 mysql = "^0.0.3"
 pymysql = "^1.0.2"
+openai = "^0.26.4"
 
 
 [build-system]

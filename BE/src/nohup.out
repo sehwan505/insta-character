@@ -22,3 +22,24 @@ INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [25350]
+INFO:     Started server process [36315]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     172.17.0.1:60676 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.17.0.1:60676 - "GET /docs HTTP/1.1" 200 OK
+INFO:     172.17.0.1:60676 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.17.0.1:60676 - "GET /docs HTTP/1.1" 200 OK
+INFO:     172.17.0.1:60676 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.17.0.1:56178 - "GET / HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:56178 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:56178 - "GET / HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:56746 - "GET / HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [36315]
+INFO:     Started server process [41430]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
