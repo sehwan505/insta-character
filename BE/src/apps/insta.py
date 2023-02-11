@@ -78,4 +78,3 @@ def _func_get_business_account_details(search_id='',instagram_account_id='', acc
 def _get_existing_user(insta_id: str, session: Session) -> User:
     user = session.query(User).filter_by(insta_id=insta_id).order_by(User.id.desc()).first()
     return user
-

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from db.model import User, InstaMedia
+from db.session import engine
+from .gpt import classfy_text
 from pydantic import BaseModel, Extra
 from typing import List
 from sqlalchemy.orm import Session
 from utils.deps import get_db
-from db.session import engine
 from datetime import datetime
 
 
@@ -44,6 +45,17 @@ def get_all_user(session: Session = Depends(get_db)):
 def get_media_by_user(insta_id: str, session: Session = Depends(get_db)):
     media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).all()
     return {"media": media}
+
+@router.get("/classifcation_by_user/{insta_id}")
+def classifications_by_user(insta_id: str, session = Depends(get_db)):
+    try:
+        media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).all()
+        captions = [m.caption for m in media]
+        response = classfy_text(captions[0])
+    except Exception as e:
+        print(e)
+        raise e
+    return {"response": ""}
 
 @router.post("/save_user_direct")
 def save_user_direct(user_data: UserData, session: Session = Depends(get_db)):

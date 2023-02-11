@@ -43,3 +43,11 @@ INFO:     Started server process [41430]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     172.17.0.1:60164 - "GET / HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:43882 - "GET / HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:43882 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:43882 - "GET / HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [41430]
