@@ -54,7 +54,7 @@ def classifications_by_user(insta_id: str, session = Depends(get_db)):
         response = classfy_text(captions[0])
     except Exception as e:
         print(e)
-        raise e
+        raise HTTPException(status_code=500, detail="server error")
     return {"response": ""}
 
 @router.post("/save_user_direct")
