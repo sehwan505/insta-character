@@ -49,13 +49,16 @@ def get_media_by_user(insta_id: str, session: Session = Depends(get_db)):
 @router.get("/classifcation_by_user/{insta_id}")
 def classifications_by_user(insta_id: str, session = Depends(get_db)):
     try:
-        media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).all()
+        media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).limit(10).all()
+        print(media[0])
+        if media == []:
+            raise HTTPException(status_code=404, detail="User not found or no media")
         captions = [m.caption for m in media]
         response = classfy_text(captions[0])
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
-    return {"response": ""}
+    return {"response": response}
 
 @router.post("/save_user_direct")
 def save_user_direct(user_data: UserData, session: Session = Depends(get_db)):
