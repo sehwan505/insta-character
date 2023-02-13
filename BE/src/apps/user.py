@@ -50,7 +50,6 @@ def get_media_by_user(insta_id: str, session: Session = Depends(get_db)):
 def classifications_by_user(insta_id: str, session = Depends(get_db)):
     try:
         media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).limit(10).all()
-        print(media[0])
         if media == []:
             raise HTTPException(status_code=404, detail="User not found or no media")
         captions = [m.caption for m in media]
