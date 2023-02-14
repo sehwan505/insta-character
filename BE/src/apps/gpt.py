@@ -9,6 +9,7 @@ openai.api_key = config["openai_secret_key"]
 
 from openai.embeddings_utils import cosine_similarity, get_embedding
 # function for classifcation of texts with embedding function in openai
+# label을 좀 더 길게 만들어볼 필요가 있다.
 def classfy_text(texts: List[str]):
     labels = [['extrovert', 'introvert'],
             ['sensing', 'intuitive'],
@@ -21,6 +22,7 @@ def classfy_text(texts: List[str]):
         mbti = []
         for label in label_embeddings:
             score = cosine_similarity(review_embedding, label[0][1]) - cosine_similarity(review_embedding, label[1][1])
+            print(label[0][0], label[1][0], score)
             if score > 0:
                 mbti.append(label[0][0])
             else:
@@ -30,8 +32,33 @@ def classfy_text(texts: List[str]):
     result = Counter([])
     for text in texts:
         result.update(label_score(text, label_embeddings))
-    return get_first_char_up_to_4th(result)
+    return get_mbti_from_counter(result, labels)
 
 # function for getting the first char in each word which have highest value in dictionary
-def get_first_char_up_to_4th(d):
-    return ''.join([k[0] for k, v in d.items()])[0:4].upper()
+def get_mbti_from_counter(counter: Counter, labels: List[List[str]]) -> str:
+    def add_more_frequent_char(result: str, s1: str, s2: str) -> str:
+        if counter[s1] > counter[s2]:
+            return s1[0].upper()
+        else:
+            return s2[0].upper()
+    
+    result = ""
+    for s1, s2 in labels:
+        result += add_more_frequent_char(result, s1, s2)
+    return result
+
+
+# 상황을 주는 것을 추가
+def generate_gpt3_response(mbti, print_output=False):
+    user_text = f"generate characteristic description of MBTI {mbti}"
+
+    completion = openai.Completion.create(
+        engine='text-davinci-003',  
+        temperature=1.5,           
+        prompt=user_text,           # What the user typed in
+        max_tokens=100,             # Maximum tokens in the prompt AND response
+        n=1,                        # The number of completions to generate
+        stop=None,                  # An optional setting to control response generation
+    )
+
+    return completion

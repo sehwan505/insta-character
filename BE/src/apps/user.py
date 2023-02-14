@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from db.model import User, InstaMedia
 from db.session import engine
-from .gpt import classfy_text
+from .gpt import classfy_text, generate_gpt3_response
 from pydantic import BaseModel, Extra
 from typing import List
 from sqlalchemy.orm import Session
@@ -46,14 +46,24 @@ def get_media_by_user(insta_id: str, session: Session = Depends(get_db)):
     media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).all()
     return {"media": media}
 
-@router.get("/classifcation_by_user/{insta_id}")
-def classifications_by_user(insta_id: str, session = Depends(get_db)):
+@router.get("/classifcation_by_media/{insta_id}")
+def classifications_by_media(insta_id: str, session = Depends(get_db)):
     try:
         media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).limit(10).all()
         if media == []:
             raise HTTPException(status_code=404, detail="User not found or no media")
         captions = [m.caption for m in media]
         response = classfy_text(captions[0])
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="server error")
+    return {"response": response}
+
+
+@router.get("/generate_characteristic_description/{mbti}")
+def classifications_by_media(mbti: str, session = Depends(get_db)):
+    try:
+        response = generate_gpt3_response(mbti)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
