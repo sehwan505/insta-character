@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from db.model import User, InstaMedia
 from db.session import engine
-from .gpt import classfy_text, generate_gpt3_response
+from .gpt import classfy_text, generate_gpt3_response, classfy_text_with_completion
 from pydantic import BaseModel, Extra
 from typing import List
 from sqlalchemy.orm import Session
@@ -53,7 +53,7 @@ def classifications_by_media(insta_id: str, session = Depends(get_db)):
         if media == []:
             raise HTTPException(status_code=404, detail="User not found or no media")
         captions = [m.caption for m in media]
-        response = classfy_text(captions[0])
+        response = classfy_text_with_completion(captions)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")

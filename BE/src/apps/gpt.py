@@ -3,6 +3,7 @@ from utils.util import config
 import openai
 from collections import Counter
 from typing import List
+import json
 
 # set credentials
 openai.api_key = config["openai_secret_key"]
@@ -51,7 +52,6 @@ def get_mbti_from_counter(counter: Counter, labels: List[List[str]]) -> str:
 # 상황을 주는 것을 추가
 def generate_gpt3_response(mbti, print_output=False):
     user_text = f"generate characteristic description of MBTI {mbti}"
-
     completion = openai.Completion.create(
         engine='text-davinci-003',  
         temperature=1.5,           
@@ -62,3 +62,19 @@ def generate_gpt3_response(mbti, print_output=False):
     )
 
     return completion
+
+def classfy_text_with_completion(texts: List[str]):
+    user_text = "\nClassify user's mbti type with these tweets\n MBTI type:"
+    user_text += "\n".join(texts)
+    completion = openai.Completion.create(
+        engine='text-davinci-003',
+        temperature=0,           
+        prompt=user_text,          
+        max_tokens=60,
+        top_p=1          
+    )
+    mbti_types = ["INFP", "INFJ", "INTP", "INTJ", "ISTP", "ISTJ", "ISFJ", "ISFP", "ENFP", "ENFJ", "ENTP", "ENTJ", "ESTP", "ESTJ", "ESFJ", "ESFP"]
+    for mbti in mbti_types:
+        if mbti in completion['choices'][0]['text']:
+            return mbti
+    return "not clear"
