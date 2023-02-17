@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from db.model import User, InstaMedia
 from db.session import engine
-from .gpt import classfy_text, generate_gpt3_response, classfy_text_with_completion
+from .gpt import classfy_text, generate_description_with_3words, classfy_text_with_completion, generate_react_about_given_situation
 from pydantic import BaseModel, Extra
 from typing import List
 from sqlalchemy.orm import Session
@@ -61,13 +61,23 @@ def classifications_by_media(insta_id: str, session = Depends(get_db)):
 
 
 @router.get("/generate_characteristic_description/{mbti}")
-def classifications_by_media(mbti: str, session = Depends(get_db)):
+def generate_characteristic_description(mbti: str, session = Depends(get_db)):
     try:
-        response = generate_gpt3_response(mbti)
+        response = generate_description_with_3words(mbti)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
     return {"response": response}
+
+@router.get("/react_about_given_situation/{mbti}")
+def react_about_given_situation(mbti: str, given_situation: str, session = Depends(get_db)):
+    try:
+        response = generate_react_about_given_situation(mbti, given_situation)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="server error")
+    return {"response": response}
+
 
 @router.post("/save_user_direct")
 def save_user_direct(user_data: UserData, session: Session = Depends(get_db)):

@@ -50,11 +50,24 @@ def get_mbti_from_counter(counter: Counter, labels: List[List[str]]) -> str:
 
 
 # 상황을 주는 것을 추가
-def generate_gpt3_response(mbti, print_output=False):
-    user_text = f"generate characteristic description of MBTI {mbti}"
+def generate_description_with_3words(mbti, print_output=False):
+    user_text = f"3 words which {mbti} person would use to describe themselves"
     completion = openai.Completion.create(
         engine='text-davinci-003',  
-        temperature=1.5,           
+        temperature=1,           
+        prompt=user_text,           # What the user typed in
+        max_tokens=100,             # Maximum tokens in the prompt AND response
+        n=1,                        # The number of completions to generate
+        stop=None,                  # An optional setting to control response generation
+    )
+
+    return completion
+
+def generate_react_about_given_situation(mbti, given_situation=None):
+    user_text = f"if {mbti} person is in this situation, what would they say?\n {given_situation}"
+    completion = openai.Completion.create(
+        engine='text-davinci-003',  
+        temperature=1,           
         prompt=user_text,           # What the user typed in
         max_tokens=100,             # Maximum tokens in the prompt AND response
         n=1,                        # The number of completions to generate
@@ -71,7 +84,7 @@ def classfy_text_with_completion(texts: List[str]):
         temperature=0,           
         prompt=user_text,          
         max_tokens=60,
-        top_p=1          
+        top_p=1
     )
     mbti_types = ["INFP", "INFJ", "INTP", "INTJ", "ISTP", "ISTJ", "ISFJ", "ISFP", "ENFP", "ENFJ", "ENTP", "ENTJ", "ESTP", "ESTJ", "ESFJ", "ESFP"]
     for mbti in mbti_types:
