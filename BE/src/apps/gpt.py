@@ -11,7 +11,7 @@ openai.api_key = config["openai_secret_key"]
 from openai.embeddings_utils import cosine_similarity, get_embedding
 # function for classifcation of texts with embedding function in openai
 # label을 좀 더 길게 만들어볼 필요가 있다.
-def classfy_text(texts: List[str]):
+def classfy_text_with_embed(texts: List[str]):
     labels = [['extrovert', 'introvert'],
             ['sensing', 'intuitive'],
             ['thinking', 'feeling'],
@@ -55,10 +55,10 @@ def generate_description_with_3words(mbti, print_output=False):
     completion = openai.Completion.create(
         engine='text-davinci-003',  
         temperature=1,           
-        prompt=user_text,           # What the user typed in
-        max_tokens=100,             # Maximum tokens in the prompt AND response
-        n=1,                        # The number of completions to generate
-        stop=None,                  # An optional setting to control response generation
+        prompt=user_text,          
+        max_tokens=100,            
+        n=1,                       
+        stop=None,                 
     )
 
     return completion
@@ -68,10 +68,10 @@ def generate_react_about_given_situation(mbti, given_situation=None):
     completion = openai.Completion.create(
         engine='text-davinci-003',  
         temperature=1,           
-        prompt=user_text,           # What the user typed in
-        max_tokens=100,             # Maximum tokens in the prompt AND response
-        n=1,                        # The number of completions to generate
-        stop=None,                  # An optional setting to control response generation
+        prompt=user_text,          
+        max_tokens=100,            
+        n=1,                       
+        stop=None,                 
     )
 
     return completion

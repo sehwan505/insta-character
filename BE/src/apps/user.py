@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from db.model import User, InstaMedia
 from db.session import engine
-from .gpt import classfy_text, generate_description_with_3words, classfy_text_with_completion, generate_react_about_given_situation
+from .gpt import classfy_text_with_embed, generate_description_with_3words, classfy_text_with_completion, generate_react_about_given_situation
 from pydantic import BaseModel, Extra
 from typing import List
 from sqlalchemy.orm import Session
@@ -99,7 +99,6 @@ def save_user(user_data: UserData, session: Session):
         print(e)
         raise HTTPException(status_code=500, detail="server error")
     return {"response": response}
-
 
 def update_user(user_data: UserData, session: Session):
     try:
