@@ -51,7 +51,7 @@ def get_mbti_from_counter(counter: Counter, labels: List[List[str]]) -> str:
 
 # 상황을 주는 것을 추가
 def generate_description_with_3words(mbti, print_output=False):
-    user_text = f"3 words which {mbti} person would use to describe themselves"
+    user_text = f"list of 3 words which {mbti} person would use to describe themselves"
     completion = openai.Completion.create(
         engine='text-davinci-003',  
         temperature=1,           
