@@ -2,11 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from db.model import User, InstaMedia
 from db.session import engine
 from .gpt import classfy_text_with_embed, generate_description_with_3words, classfy_text_with_completion, generate_react_about_given_situation
+from .translate import translate_en2ko
 from pydantic import BaseModel, Extra
 from typing import List
 from sqlalchemy.orm import Session
 from utils.deps import get_db
 from datetime import datetime
+import re
 
 
 router = APIRouter(
@@ -46,7 +48,7 @@ def get_media_by_user(insta_id: str, session: Session = Depends(get_db)):
     media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).all()
     return {"media": media}
 
-@router.get("/classifcation_by_media/{insta_id}")
+@router.get("/classification_by_media/{insta_id}")
 def classifications_by_media(insta_id: str, session = Depends(get_db)):
     try:
         media = session.query(InstaMedia).filter(InstaMedia.insta_id == insta_id).limit(10).all()
@@ -64,15 +66,20 @@ def classifications_by_media(insta_id: str, session = Depends(get_db)):
 def generate_characteristic_description(mbti: str, session = Depends(get_db)):
     try:
         response = generate_description_with_3words(mbti)
+        response = translate_en2ko(response["choices"][0]["text"])
+        list_3words = re.split(r'\n*[1-9]. \n*', response)
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
-    return {"response": response}
+    return {"response": list_3words[1:]}
 
 @router.get("/react_about_given_situation/{mbti}")
 def react_about_given_situation(mbti: str, given_situation: str, session = Depends(get_db)):
     try:
         response = generate_react_about_given_situation(mbti, given_situation)
+        print(response)
+        response = translate_en2ko(response["choices"][0]["text"])
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="server error")
