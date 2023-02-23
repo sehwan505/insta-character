@@ -1,10 +1,9 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { addName, remove } from './features/user/userSlice'
 import React, { useState } from "react";
 import "./styles.css";
 import axios from 'axios';
 
 const App = () => {
+  const [loading, setLoading] = useState(false);
   const [instagramId, setInstagramId] = useState("");
   const [mbtiType, setMbtiType] = useState("");
   const [mbtiDescription, setMbtiDescription] = useState([]);
@@ -16,6 +15,7 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     fetchMbtiData();
+    console.log(loading);
   };
 
   const fetchMbtiData = async () => {
@@ -23,20 +23,25 @@ const App = () => {
     
     axios.get(`https://k-army-project-irpqk.run.goorm.site/user/classification_by_media/${instagramId}`)
     .then(function (response) {
+      setLoading(true);
       const data = response.data;
       const mbti = data.response;
-      setMbtiType(mbti);
 
       axios.get(`https://k-army-project-irpqk.run.goorm.site/user/generate_characteristic_description/${mbti}`)
         .then(function (response) {
+          setMbtiType(mbti);
           setMbtiDescription(response.data.response);
           console.log(response.data.response);
+          console.log(loading);
+          setLoading(false);
         })
         .catch(function (error) {
+          setLoading(false);
           console.error(error);
         });
     })
     .catch(function (error) {
+      setLoading(false);
       console.error(error);
     });
   };
@@ -45,12 +50,11 @@ const App = () => {
     <div className="container">
       {mbtiType ? (
         <div className="mbti-container">
-          <h2>{mbtiType}</h2>
-          <ul>
+          <h1 style={{"fontWeight":700, "fontSize": 30}}>{mbtiType}</h1>
             {mbtiDescription.map((description, index) => (
-              <li key={index}>{description}</li>
+              <div key={index} className="hashtag-box">#{description}</div>
             ))}
-          </ul>
+          <button type="button" onClick={() => {setMbtiType("");}}>Retry</button>
         </div>
       ) : (
         <div className="form-container">
@@ -62,7 +66,7 @@ const App = () => {
             value={instagramId}
             onChange={handleInputChange}
           />
-          <button type="submit">Submit</button>
+          <button type="submit">{loading ? <>Loading..</> : <>Submit</>}</button>
         </form>
       </div>
       )}
