@@ -2,7 +2,7 @@
 name = "insta-character"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Sehwan Park <sehwan505@gmail.com>"]
 license = "MIT License"
 readme = "README.md"
 packages = [{include = "insta_character"}]
